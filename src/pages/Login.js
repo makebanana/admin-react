@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 import md5 from 'js-md5';
-import { notification } from 'antd';
+import { Notify } from 'zent';
 import { observer, inject } from 'mobx-react';
 import request from '../utils/request';
 
@@ -10,8 +9,8 @@ import request from '../utils/request';
 @inject('loginStore') @observer
 export default class Login extends Component {
   state = {
-    mobile: null,
-    password: null
+    mobile: '',
+    password: ''
   }
 
   // 绑定输入事件
@@ -33,28 +32,19 @@ export default class Login extends Component {
         password: md5(password)
       }
     }).then((data) => {
-      localStorage.setItem('bu_authorization', data.authorization);
-      localStorage.setItem('bu_userId', data.userId);
-      this.props.loginStore.tokenUpdate();
+      localStorage.setItem('yz_userId', data.userId);
+      this.props.loginStore.tokenUpdate(data.authorization);
 
-      notification.success({
-        message: '登录成功',
-        description: '欢迎回来～'
-      });
+      Notify.success();
     });
   }
 
   render() {
-    if (this.props.loginStore.token) {
-      return (<Redirect to="/" />);
-    }
-
     return (
       <div>
         <input value={this.state.mobile} name="mobile" placeholder="账号" onInput={this.handleBindInput} />
         <input value={this.state.password} name="password" placeholder="密码" type="password" onInput={this.handleBindInput} />
         <button onClick={this.handleLogin}>登录</button>
-        <p>You must log in to view the page at {this.state.from.pathname}</p>
       </div>
     );
   }

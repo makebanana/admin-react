@@ -7,16 +7,17 @@ import {
 useStrict(true);
 
 class LoginStore {
-  @observable token = localStorage.getItem('local_authorization')
+  @observable token = localStorage.getItem('yz_authorization')
 
-  @action tokenUpdate = () => {
-    this.token = localStorage.getItem('local_authorization');
+  @action tokenUpdate = (token) => {
+    localStorage.setItem('bu_authorization', token);
+    this.token = token;
   }
 
   @action tokenRemove = () => {
     // 删除用户token
-    localStorage.removeItem('bu_authorization');
-    localStorage.removeItem('bu_userId');
+    localStorage.removeItem('yz_authorization');
+    localStorage.removeItem('yz_authorization');
     this.token = null;
   }
 }
