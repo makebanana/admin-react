@@ -1,7 +1,7 @@
 import zanPcAjax from 'zan-pc-ajax';
 import { Notify, Sweetalert } from 'zent';
 import loginStore from '../store/loginStore';
-import LangHelper from './langHelper';
+import langHelper from './langHelper';
 
 const codeMessage = {
   zh: {
@@ -42,12 +42,12 @@ const codeMessage = {
 };
 
 // catch server uncatch error
-function checkStatus(response) {
-  const errortext = codeMessage[LangHelper.key][response.status] || response.statusText;
-  Notify.error(`${response.status}: ${errortext}`, 2000);
+function checkStatus(msg) {
+  const status = msg.substr(32, 4);
+  const errortext = codeMessage[langHelper.key][status] || msg;
+  Notify.error(`${status}: ${errortext}`, 2000);
   const error = new Error(errortext);
-  error.name = response.status;
-  error.response = response;
+  error.name = status;
   throw error;
 }
 
@@ -59,11 +59,11 @@ function checkCode(response) {
   }
 
   if (serverCode === 401) {
-    const langKey = Number(LangHelper.key === 'en');
+    const langKey = Number(langHelper.key === 'en');
     loginStore.tokenRemove();
     Sweetalert.alert({
       title: ['提示', 'FYA'][langKey],
-      content: codeMessage[LangHelper.key][401],
+      content: codeMessage[langHelper.key][401],
       confirmType: 'danger',
       onConfirm: () => {
         location.href = '/';
@@ -72,9 +72,14 @@ function checkCode(response) {
     return;
   }
 
-  Notify.error(`${serverCode}: ${codeMessage[LangHelper.key][serverCode] || response.data.massege || ''}`, 2000);
+  const errortext = `${serverCode}: ${codeMessage[langHelper.key][serverCode] || response.data.massege || ''}`;
+  Notify.error(errortext, 2000);
 
-  throw response.data;
+  const error = new Error(errortext);
+  error.name = response.status;
+  error.response = response;
+
+  throw error;
 }
 
 export default function ajax(baseoOption) {
