@@ -50,7 +50,7 @@ class LangHelper {
   }
 
   rmListen(fn) {
-    this.callback = this.filter(cb => cb === fn);
+    this.callback = this.callback.filter(cb => cb === fn);
   }
 }
 
