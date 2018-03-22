@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { I18nProvider } from 'zent';
-import enUS from 'zent/lib/i18n/en-US';
-import zhCN from 'zent/lib/i18n/zh-CN';
 import langHelper from '../utils/langHelper';
 
-console.warn(`import enUS from 'zent/lib/i18n/en-US'  reuturn: ${enUS}`);
-console.warn(`import zhCN from 'zent/lib/i18n/en-US'  reuturn: ${zhCN}`);
+const enUS = require('zent/lib/i18n/en-US');
+const zhCN = require('zent/lib/i18n/zh-CN');
+
 const lang = {
   en: enUS,
   zh: zhCN
