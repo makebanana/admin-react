@@ -12,7 +12,6 @@ const LoadableLogin = Loadable({
 });
 
 @inject('loginStore') @observer
-
 export default class SimpleRouter extends Component {
   render() {
     const { token } = this.props.loginStore;

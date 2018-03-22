@@ -67,6 +67,7 @@
     "test": "node scripts/test.js --env=jsdom",
     "lint:css": "stylelint './src/**/*.js'"
   },
+  "proxy": "http://127.0.0.1:9999",
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,mjs}"

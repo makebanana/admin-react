@@ -5,6 +5,8 @@ import enUS from 'zent/lib/i18n/en-US';
 import zhCN from 'zent/lib/i18n/zh-CN';
 import langHelper from '../utils/langHelper';
 
+console.warn(`import enUS from 'zent/lib/i18n/en-US'  reuturn: ${enUS}`);
+console.warn(`import zhCN from 'zent/lib/i18n/en-US'  reuturn: ${zhCN}`);
 const lang = {
   en: enUS,
   zh: zhCN
@@ -25,10 +27,6 @@ export default class I18nWrapper extends Component {
   componentWillMount() {
     langHelper.config({ useHash: this.props.useHash });
     langHelper.listen(this.urlListener);
-
-    setTimeout(() => {
-      langHelper.updateLang('zh');
-    }, 2000);
   }
 
   componentWillReceiveProps({ useHash }) {
@@ -41,6 +39,7 @@ export default class I18nWrapper extends Component {
     if (this.state.lang === nextState.lang) {
       return false;
     }
+    return true;
   }
 
   componentWillUnmount() {
@@ -54,7 +53,6 @@ export default class I18nWrapper extends Component {
   }
 
   render() {
-    console.log(123);
     return (
       <I18nProvider i18n={lang[this.state.lang]}>
         {this.props.children}

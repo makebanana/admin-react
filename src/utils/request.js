@@ -19,7 +19,8 @@ const codeMessage = {
     500: '服务器发生错误，请检查服务器。',
     502: '网关错误。',
     503: '服务不可用，服务器暂时过载或维护。',
-    504: '网关超时。'
+    504: '网关超时。',
+    999: '服务器错误'
   },
   en: {
     200: 'The server succeeds in returning the requested data.',
@@ -36,15 +37,16 @@ const codeMessage = {
     500: 'An error occurred on the server. Please check the server.',
     502: 'Gateway error.',
     503: 'The service is not available, and the server is temporarily overloaded or maintained.',
-    504: 'The gateway is out of time.'
+    504: 'The gateway is out of time.',
+    999: 'The server error'
   }
 
 };
 
 // catch server uncatch error
-function checkStatus(msg) {
-  const status = msg.substr(32, 4);
-  const errortext = codeMessage[langHelper.key][status] || msg;
+function checkStatus({ msg }) {
+  const status = msg.substr(32, 3);
+  const errortext = codeMessage[langHelper.key][status] || codeMessage[langHelper.key][999];
   Notify.error(`${status}: ${errortext}`, 2000);
   const error = new Error(errortext);
   error.name = status;
@@ -53,8 +55,8 @@ function checkStatus(msg) {
 
 // catch server catch error
 function checkCode(response) {
-  const serverCode = response.data.code;
-  if (response.data.code === 200) {
+  const serverCode = response.code;
+  if (response.code === 200) {
     return response.data;
   }
 
@@ -89,7 +91,8 @@ export default function ajax(baseoOption) {
     headers: {
       authorization: sessionStorage.getItem('V_accessToken'),
       ...baseoOption.headers
-    }
+    },
+    rawResponse: true
   };
   return zanPcAjax(option)
     .catch(checkStatus)

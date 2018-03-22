@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Notify, Form, Button } from 'zent';
 import { observer, inject } from 'mobx-react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import md5 from 'js-md5';
 import request from '../utils/request';
@@ -21,6 +22,15 @@ const StyleLoginBox = styled.div`
 const StyleSubmitBox = styled.div`
   text-align: center;
 `;
+
+// const langData = {
+//   zh: {
+//     welcome: '登录成功，管理员：'
+//   },
+//   en: {
+//     welcome: 'Login success，Administrators：'
+//   }
+// };
 
 class LoginForm extends Component {
   submit = (values) => {
@@ -77,6 +87,10 @@ const WrappedForm = createForm()(LoginForm);
 
 @inject('loginStore') @observer
 export default class Login extends Component {
+  static contextTypes = {
+    zentI18n: PropTypes.object,
+  }
+
   state = {
     isLogining: false
   }
@@ -98,8 +112,8 @@ export default class Login extends Component {
       localStorage.setItem('yz_userId', data.userId);
       this.props.loginStore.tokenUpdate(data.authorization);
 
-      Notify.success();
-    }).finally(() => {
+      Notify.success(`登陆成功，管理员： ${data.name}`);
+    }).catch(() => {
       this.setState({
         isLogining: false
       });
