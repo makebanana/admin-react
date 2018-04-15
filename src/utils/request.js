@@ -1,4 +1,4 @@
-import zanPcAjax from 'zan-pc-ajax';
+import axios from 'axios';
 import { Notify, Sweetalert } from 'zent';
 import loginStore from '../store/loginStore';
 import langHelper from './langHelper';
@@ -44,9 +44,9 @@ const codeMessage = {
 };
 
 // catch server uncatch error
-function checkStatus({ msg }) {
-  const status = msg.substr(32, 3);
-  const errortext = codeMessage[langHelper.key][status] || codeMessage[langHelper.key][999];
+function checkStatus({ response = {} }) {
+  const { status = 999 } = response;
+  const errortext = codeMessage[langHelper.key][status];
   Notify.error(`${status}: ${errortext}`, 2000);
   const error = new Error(errortext);
   error.name = status;
@@ -54,10 +54,10 @@ function checkStatus({ msg }) {
 }
 
 // catch server catch error
-function checkCode(response) {
-  const serverCode = response.code;
-  if (response.code === 200) {
-    return response.data;
+function checkCode({ data, status, ...others }) {
+  const serverCode = data.code;
+  if (serverCode === 200) {
+    return data.data;
   }
 
   if (serverCode === 401) {
@@ -67,34 +67,48 @@ function checkCode(response) {
       title: ['提示', 'FYA'][langKey],
       content: codeMessage[langHelper.key][401],
       confirmType: 'danger',
-      onConfirm: () => {
-        location.href = '/';
-      },
     });
-    return;
   }
 
-  const errortext = `${serverCode}: ${codeMessage[langHelper.key][serverCode] || response.data.massege || ''}`;
+
+  const errortext = `${serverCode}: ${codeMessage[langHelper.key][serverCode] || data.massege || ''}`;
   Notify.error(errortext, 2000);
 
   const error = new Error(errortext);
-  error.name = response.status;
-  error.response = response;
+  error.name = status;
+  error.response = {
+    status,
+    ...others,
+  };
 
   throw error;
 }
 
-export default function ajax(baseoOption) {
-  const option = {
-    contentType: baseoOption.data instanceof FormData ? 'multipart/form-data' : 'application/json',
-    ...baseoOption,
+export default function fetch(options) {
+  const instance = axios.create({
+    timeout: options.timeout || 4000,
     headers: {
-      authorization: sessionStorage.getItem('V_accessToken'),
-      ...baseoOption.headers
-    },
-    rawResponse: true
-  };
-  return zanPcAjax(option)
+      Accept: 'application/json',
+      authorization: sessionStorage.getItem('yz_authorization'),
+      'Content-Type': options.data instanceof FormData ? 'multipart/form-data' : 'application/json',
+      ...options.headers
+    }
+  });
+
+  /**
+  * 拦截器
+  */
+  instance.interceptors.request.use((config) => {
+    const newConfig = config;
+    // 在发送请求之前做些什么
+    newConfig.method = options.method || 'GET';
+    if (config.method === 'GET') {
+      newConfig.params = config.data;
+    }
+    return newConfig;
+  });
+
+  return instance(options)
     .catch(checkStatus)
     .then(checkCode);
 }

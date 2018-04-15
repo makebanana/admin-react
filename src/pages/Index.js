@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import AuthNav from './AuthNav';
 
 const StyledAppWrap = styled.div`
   width: 100%;
@@ -12,6 +13,15 @@ const StyledHeader = styled.div`
   width: 100%;
   height: 60px;
   background-color: #404040;
+`;
+
+const StyledLogo = styled.span`
+  display: inline-block;
+  margin: 15px 20px;
+  width: 160px;
+  height: 30px;
+  background-color: #333;
+  border-radius: 4px;
 `;
 
 const StyledContain = styled.div`
@@ -26,6 +36,7 @@ const StyledLeftNav = styled.div`
 `;
 
 const StyledMain = styled.div`
+  flex: 1;
   width: 100%;
 `;
 
@@ -34,14 +45,19 @@ export default class Login extends Component {
     zentI18n: PropTypes.object
   }
 
+  onMenuClick = (e, key) => {
+    console.log(e, key);
+  }
   render() {
     return (
       <StyledAppWrap>
         <StyledHeader>
-          123
+          <StyledLogo />
         </StyledHeader>
         <StyledContain>
-          <StyledLeftNav>12322</StyledLeftNav>
+          <StyledLeftNav>
+            <AuthNav />
+          </StyledLeftNav>
           <StyledMain>312312</StyledMain>
         </StyledContain>
       </StyledAppWrap>
