@@ -1,7 +1,9 @@
-import axios from 'axios';
+import axios, { CancelToken } from 'axios';
 import { Notify, Sweetalert } from 'zent';
 import loginStore from '../store/loginStore';
 import langHelper from './langHelper';
+
+const source = CancelToken.source();
 
 const codeMessage = {
   zh: {
@@ -68,6 +70,8 @@ function checkCode({ data, status, ...others }) {
       content: codeMessage[langHelper.key][401],
       confirmType: 'danger',
     });
+
+    source.cancel(codeMessage[langHelper.key][401]);
   }
 
 
@@ -92,7 +96,8 @@ export default function fetch(options) {
       authorization: sessionStorage.getItem('yz_authorization'),
       'Content-Type': options.data instanceof FormData ? 'multipart/form-data' : 'application/json',
       ...options.headers
-    }
+    },
+    cancelToken: source.token
   });
 
   /**
